@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Staff Dashboard | QueueLess</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f4f6f8;
+            color: #222;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 800px;
+            margin: 60px auto;
+        }
+
+        .card {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            box-shadow: 0 3px 15px rgba(0, 0, 0, 0.08);
+        }
+
+        h1 {
+            margin-bottom: 5px;
+        }
+
+        .subtitle {
+            color: #777;
+            margin-bottom: 30px;
+        }
+
+        .counter {
+            padding: 20px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .counter:last-child {
+            border-bottom: none;
+        }
+
+        .counter h2 {
+            margin: 0 0 5px;
+        }
+
+        .service {
+            color: #666;
+            margin-bottom: 15px;
+        }
+
+        .button {
+            display: inline-block;
+            padding: 10px 18px;
+            background: #222;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            margin-right: 8px;
+            border: none;
+            cursor: pointer;
+        }
+
+        .button:hover {
+            background: #444;
+        }
+
+        .complete {
+            background: #2e8b57;
+        }
+
+        .complete:hover {
+            background: #246b45;
+        }
+
+        .skip {
+            background: #d9534f;
+        }
+
+        .skip:hover {
+            background: #b52b27;
+        }
+
+        .token {
+            padding: 18px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .token:last-child {
+            border-bottom: none;
+        }
+
+        .token-number {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .status {
+            font-weight: bold;
+        }
+
+        .waiting {
+            color: #d89b00;
+        }
+
+        .serving {
+            color: #1976d2;
+        }
+
+        .empty {
+            color: #777;
+        }
+
+        .navigation {
+            margin-top: 25px;
+        }
+
+        .navigation a {
+            margin-right: 15px;
+            color: #222;
+            font-weight: bold;
+            text-decoration: none;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>QueueLess</h1>
+
+    <p class="subtitle">
+        Staff Dashboard
+    </p>
+
+    <div class="card">
+
+        <h2>
+            Welcome, {{ request.user.username }}
+        </h2>
+
+        <h2>Your Counters</h2>
+
+        {% if counters %}
+
+            {% for counter in counters %}
+
+                <div class="counter">
+
+                    <h2>
+                        {{ counter.name }}
+                    </h2>
+
+                    <div class="service">
+                        Service: <strong>{{ counter.service.name }}</strong>
+                    </div>
+
+                    <a
+                        href="{% url 'call_next' counter.id %}"
+                        class="button"
+                    >
+                        Call Next
+                    </a>
+
+                </div>
+
+            {% endfor %}
+
+        {% else %}
+
+            <p class="empty">
+                No active counters assigned to you.
+            </p>
+
+        {% endif %}
+
+    </div>
+
+
+    <div class="card">
+
+        <h2>Current Queue</h2>
+
+        {% if tokens %}
+
+            {% for token in tokens %}
+
+                <div class="token">
+
+                    <div class="token-number">
+                        #{{ token.token_number }}
+                    </div>
+
+                    <div>
+                        Customer:
+                        <strong>{{ token.user.username }}</strong>
+                    </div>
+
+                    <div>
+                        Service:
+                        <strong>{{ token.service.name }}</strong>
+                    </div>
+
+                    <div>
+                        Status:
+
+                        {% if token.status == "WAITING" %}
+
+                            <span class="status waiting">
+                                Waiting
+                            </span>
+
+                        {% elif token.status == "SERVING" %}
+
+                            <span class="status serving">
+                                Serving
+                            </span>
+
+                        {% endif %}
+                    </div>
+
+                    {% if token.status == "SERVING" %}
+
+                        <br>
+
+                        <a
+                            href="{% url 'complete_token' token.id %}"
+                            class="button complete"
+                        >
+                            Complete
+                        </a>
+
+                        <a
+                            href="{% url 'skip_token' token.id %}"
+                            class="button skip"
+                        >
+                            Skip
+                        </a>
+
+                    {% endif %}
+
+                </div>
+
+            {% endfor %}
+
+        {% else %}
+
+            <p class="empty">
+                No waiting or serving tokens.
+            </p>
+
+        {% endif %}
+
+    </div>
+
+
+    <div class="navigation">
+
+        <a href="{% url 'services' %}">
+            Customer Services
+        </a>
+
+        |
+
+        <a href="{% url 'logout' %}">
+            Logout
+        </a>
+
+    </div>
+
+</div>
+
+</body>
+
+</html>

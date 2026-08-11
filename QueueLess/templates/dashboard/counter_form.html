@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>{{ title }} | QueueLess</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f4f6f8;
+            color: #222;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 600px;
+            margin: 60px auto;
+        }
+
+        .card {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 3px 15px rgba(0,0,0,0.08);
+        }
+
+        h1 {
+            margin-top: 0;
+        }
+
+        label {
+            display: block;
+            margin-top: 18px;
+            margin-bottom: 7px;
+            font-weight: bold;
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 15px;
+            background: white;
+        }
+
+        button,
+        a {
+            display: inline-block;
+            margin-top: 25px;
+            padding: 11px 18px;
+            border: none;
+            border-radius: 6px;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        button {
+            background: #222;
+            color: white;
+        }
+
+        a {
+            background: #777;
+            color: white;
+            margin-left: 8px;
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+<div class="container">
+
+    <div class="card">
+
+        <h1>{{ title }}</h1>
+
+        <form method="POST">
+
+            {% csrf_token %}
+
+
+            <label for="name">
+                Counter Name
+            </label>
+
+            <input
+                type="text"
+                id="name"
+                name="name"
+                value="{{ counter.name|default:'' }}"
+                placeholder="Example: Counter 1"
+                required
+            >
+
+
+            <label for="service">
+                Service
+            </label>
+
+            <select
+                id="service"
+                name="service"
+                required
+            >
+
+                <option value="">
+                    Select Service
+                </option>
+
+                {% for service in services %}
+
+                <option
+                    value="{{ service.id }}"
+                    {% if counter.service.id == service.id %}
+                        selected
+                    {% endif %}
+                >
+
+                    {{ service.name }}
+
+                </option>
+
+                {% endfor %}
+
+            </select>
+
+
+            <label for="staff">
+                Assign Staff
+            </label>
+
+            <select
+                id="staff"
+                name="staff"
+            >
+
+                <option value="">
+                    Not Assigned
+                </option>
+
+                {% for staff in staff_users %}
+
+                <option
+                    value="{{ staff.id }}"
+                    {% if counter.staff.id == staff.id %}
+                        selected
+                    {% endif %}
+                >
+
+                    {{ staff.username }}
+
+                </option>
+
+                {% endfor %}
+
+            </select>
+
+
+            <button type="submit">
+                {{ button_text }}
+            </button>
+
+            <a href="{% url 'admin_dashboard' %}">
+                Cancel
+            </a>
+
+        </form>
+
+    </div>
+
+</div>
+
+</body>
+
+</html>

@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Admin Dashboard | QueueLess</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #111;
+            color: #eee;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 40px auto;
+        }
+
+        h1 {
+            margin-bottom: 5px;
+        }
+
+        .subtitle {
+            color: #aaa;
+            margin-bottom: 30px;
+        }
+
+        /* =========================
+           STATISTICS
+        ========================= */
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 18px;
+            margin-bottom: 18px;
+        }
+
+        .stat-card {
+            background: #171919;
+            padding: 25px;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .stat-card h2 {
+            font-size: 32px;
+            margin: 0 0 8px;
+        }
+
+        .stat-card p {
+            margin: 0;
+            color: #aaa;
+        }
+
+        .waiting-number {
+            color: #f5b900;
+        }
+
+        .serving-number {
+            color: #4da3ff;
+        }
+
+        .completed-number {
+            color: #69d69b;
+        }
+
+        .skipped-number {
+            color: #ff6262;
+        }
+
+        .large-stat {
+            margin-bottom: 30px;
+        }
+
+        /* =========================
+           SECTIONS
+        ========================= */
+
+        .section {
+            background: #171919;
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            gap: 15px;
+        }
+
+        .section h2 {
+            margin: 0;
+        }
+
+        /* =========================
+           TABLES
+        ========================= */
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            padding: 13px 10px;
+            text-align: left;
+            border-bottom: 1px solid #2b2d2d;
+        }
+
+        th {
+            color: #aaa;
+        }
+
+        td {
+            color: #ddd;
+        }
+
+        /* =========================
+           STATUS
+        ========================= */
+
+        .status {
+            font-weight: bold;
+        }
+
+        .active {
+            color: #69d69b;
+        }
+
+        .inactive {
+            color: #ff6262;
+        }
+
+        .waiting {
+            color: #f5b900;
+        }
+
+        .serving {
+            color: #4da3ff;
+        }
+
+        .completed {
+            color: #69d69b;
+        }
+
+        .skipped {
+            color: #ff6262;
+        }
+
+        /* =========================
+           BUTTONS
+        ========================= */
+
+        .button {
+            display: inline-block;
+            padding: 10px 16px;
+            margin-right: 6px;
+            margin-bottom: 6px;
+            background: #222;
+            color: white;
+            text-decoration: none;
+            border: none;
+            border-radius: 7px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .button:hover {
+            background: #333;
+        }
+
+        .button.success {
+            background: #245f42;
+        }
+
+        .button.success:hover {
+            background: #2d7953;
+        }
+
+        .button.warning {
+            background: #755b18;
+        }
+
+        .button.warning:hover {
+            background: #96731f;
+        }
+
+        .button.danger {
+            background: #8f2929;
+        }
+
+        .button.danger:hover {
+            background: #b33333;
+        }
+
+        .button.primary {
+            background: #315f8f;
+        }
+
+        .button.primary:hover {
+            background: #3b73ad;
+        }
+
+        .action-form {
+            display: inline;
+        }
+
+        .empty {
+            color: #888;
+            padding: 10px 0;
+        }
+
+        /* =========================
+           NAVIGATION
+        ========================= */
+
+        .navigation {
+            margin-top: 25px;
+        }
+
+        /* =========================
+           MOBILE
+        ========================= */
+
+        @media (max-width: 900px) {
+
+            .stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .section-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+
+        @media (max-width: 600px) {
+
+            .container {
+                width: 95%;
+                margin: 20px auto;
+            }
+
+            .stats {
+                grid-template-columns: 1fr;
+            }
+
+            .section {
+                overflow-x: auto;
+            }
+
+            table {
+                min-width: 900px;
+            }
+        }
+    </style>
+</head>
+
+
+<body>
+
+<div class="container">
+
+    <!-- =========================
+         HEADER
+    ========================== -->
+
+    <h1>QueueLess Admin Dashboard</h1>
+
+    <p class="subtitle">
+        Monitor services, counters, staff and queue activity.
+    </p>
+
+
+    <!-- =========================
+         STATISTICS
+    ========================== -->
+
+    <div class="stats">
+
+        <div class="stat-card">
+            <h2>{{ total_services }}</h2>
+            <p>Total Services</p>
+        </div>
+
+        <div class="stat-card">
+            <h2>{{ active_services }}</h2>
+            <p>Active Services</p>
+        </div>
+
+        <div class="stat-card">
+            <h2>{{ total_counters }}</h2>
+            <p>Total Counters</p>
+        </div>
+
+        <div class="stat-card">
+            <h2>{{ active_counters }}</h2>
+            <p>Active Counters</p>
+        </div>
+
+    </div>
+
+
+    <div class="stats">
+
+        <div class="stat-card">
+            <h2>{{ total_tokens }}</h2>
+            <p>Total Tokens</p>
+        </div>
+
+        <div class="stat-card">
+            <h2 class="waiting-number">
+                {{ waiting_tokens }}
+            </h2>
+            <p>Waiting</p>
+        </div>
+
+        <div class="stat-card">
+            <h2 class="serving-number">
+                {{ serving_tokens }}
+            </h2>
+            <p>Serving</p>
+        </div>
+
+        <div class="stat-card">
+            <h2 class="completed-number">
+                {{ completed_tokens }}
+            </h2>
+            <p>Completed</p>
+        </div>
+
+    </div>
+
+
+    <div class="stats large-stat">
+
+        <div
+            class="stat-card"
+            style="grid-column: 1 / -1;"
+        >
+
+            <h2 class="skipped-number">
+                {{ skipped_tokens }}
+            </h2>
+
+            <p>Skipped Tokens</p>
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================
+         SERVICES
+    ========================== -->
+
+    <div class="section">
+
+        <div class="section-header">
+
+            <h2>Services</h2>
+
+            <a
+                href="{% url 'service_create' %}"
+                class="button success"
+            >
+                + Add Service
+            </a>
+
+        </div>
+
+
+        {% if services %}
+
+        <table>
+
+            <thead>
+
+                <tr>
+                    <th>Name</th>
+                    <th>Description</th>
+                    <th>Average Time</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+
+            </thead>
+
+
+            <tbody>
+
+                {% for service in services %}
+
+                <tr>
+
+                    <td>
+                        {{ service.name }}
+                    </td>
+
+                    <td>
+                        {{ service.description }}
+                    </td>
+
+                    <td>
+                        {{ service.average_service_time }} minutes
+                    </td>
+
+                    <td>
+
+                        {% if service.is_active %}
+
+                            <span class="status active">
+                                Active
+                            </span>
+
+                        {% else %}
+
+                            <span class="status inactive">
+                                Inactive
+                            </span>
+
+                        {% endif %}
+
+                    </td>
+
+
+                    <td>
+
+                        <a
+                            href="{% url 'service_edit' service.id %}"
+                            class="button primary"
+                        >
+                            Edit
+                        </a>
+
+
+                        <form
+                            method="POST"
+                            action="{% url 'service_toggle' service.id %}"
+                            class="action-form"
+                        >
+
+                            {% csrf_token %}
+
+                            <button
+                                type="submit"
+                                class="button warning"
+                            >
+
+                                {% if service.is_active %}
+                                    Disable
+                                {% else %}
+                                    Activate
+                                {% endif %}
+
+                            </button>
+
+                        </form>
+
+                    </td>
+
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+        {% else %}
+
+            <p class="empty">
+                No services available.
+            </p>
+
+        {% endif %}
+
+    </div>
+
+
+    <!-- =========================
+         COUNTERS
+    ========================== -->
+
+    <div class="section">
+
+        <div class="section-header">
+
+            <h2>Counters</h2>
+
+            <a
+                href="{% url 'counter_create' %}"
+                class="button success"
+            >
+                + Add Counter
+            </a>
+
+        </div>
+
+
+        {% if counters %}
+
+        <table>
+
+            <thead>
+
+                <tr>
+                    <th>Counter</th>
+                    <th>Service</th>
+                    <th>Staff</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+
+            </thead>
+
+
+            <tbody>
+
+                {% for counter in counters %}
+
+                <tr>
+
+                    <td>
+                        {{ counter.name }}
+                    </td>
+
+                    <td>
+                        {{ counter.service.name }}
+                    </td>
+
+                    <td>
+
+                        {% if counter.staff %}
+
+                            {{ counter.staff.username }}
+
+                        {% else %}
+
+                            Not Assigned
+
+                        {% endif %}
+
+                    </td>
+
+
+                    <td>
+
+                        {% if counter.is_active %}
+
+                            <span class="status active">
+                                Active
+                            </span>
+
+                        {% else %}
+
+                            <span class="status inactive">
+                                Inactive
+                            </span>
+
+                        {% endif %}
+
+                    </td>
+
+
+                    <td>
+
+                        <a
+                            href="{% url 'counter_edit' counter.id %}"
+                            class="button primary"
+                        >
+                            Edit
+                        </a>
+
+
+                        <form
+                            method="POST"
+                            action="{% url 'counter_toggle' counter.id %}"
+                            class="action-form"
+                        >
+
+                            {% csrf_token %}
+
+                            <button
+                                type="submit"
+                                class="button warning"
+                            >
+
+                                {% if counter.is_active %}
+                                    Disable
+                                {% else %}
+                                    Activate
+                                {% endif %}
+
+                            </button>
+
+                        </form>
+
+                    </td>
+
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+        {% else %}
+
+            <p class="empty">
+                No counters available.
+            </p>
+
+        {% endif %}
+
+    </div>
+
+
+    <!-- =========================
+         TOKEN ACTIVITY
+    ========================== -->
+
+    <div class="section">
+
+        <div class="section-header">
+
+            <h2>Token Activity</h2>
+
+        </div>
+
+
+        {% if tokens %}
+
+        <table>
+
+            <thead>
+
+                <tr>
+                    <th>Token</th>
+                    <th>Service</th>
+                    <th>Customer</th>
+                    <th>Counter</th>
+                    <th>Status</th>
+                    <th>Created</th>
+                </tr>
+
+            </thead>
+
+
+            <tbody>
+
+                {% for token in tokens %}
+
+                <tr>
+
+                    <td>
+                        #{{ token.token_number }}
+                    </td>
+
+                    <td>
+                        {{ token.service.name }}
+                    </td>
+
+                    <td>
+                        {{ token.user.username }}
+                    </td>
+
+                    <td>
+
+                        {% if token.counter %}
+
+                            {{ token.counter.name }}
+
+                        {% else %}
+
+                            Not Assigned
+
+                        {% endif %}
+
+                    </td>
+
+                    <td>
+
+                        {% if token.status == "WAITING" %}
+
+                            <span class="status waiting">
+                                Waiting
+                            </span>
+
+                        {% elif token.status == "SERVING" %}
+
+                            <span class="status serving">
+                                Serving
+                            </span>
+
+                        {% elif token.status == "COMPLETED" %}
+
+                            <span class="status completed">
+                                Completed
+                            </span>
+
+                        {% elif token.status == "SKIPPED" %}
+
+                            <span class="status skipped">
+                                Skipped
+                            </span>
+
+                        {% else %}
+
+                            {{ token.get_status_display }}
+
+                        {% endif %}
+
+                    </td>
+
+                    <td>
+                        {{ token.created_at|date:"d M Y, h:i A" }}
+                    </td>
+
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+        {% else %}
+
+            <p class="empty">
+                No tokens have been generated yet.
+            </p>
+
+        {% endif %}
+
+    </div>
+
+
+    <!-- =========================
+         NAVIGATION
+    ========================== -->
+
+    <div class="navigation">
+
+        <a
+            href="{% url 'services' %}"
+            class="button"
+        >
+            Customer Services
+        </a>
+
+        <a
+            href="{% url 'staff_dashboard' %}"
+            class="button"
+        >
+            Staff Dashboard
+        </a>
+
+        <a
+            href="{% url 'logout' %}"
+            class="button danger"
+        >
+            Logout
+        </a>
+
+    </div>
+
+</div>
+
+</body>
+
+</html>
